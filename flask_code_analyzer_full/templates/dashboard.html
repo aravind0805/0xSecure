@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - Static Code Analyzer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Orbitron', sans-serif;
+      background: #0d0820;
+      color: #00f0ff;
+      overflow: hidden;
+      cursor: url('https://cdn-icons-png.flaticon.com/32/6001/6001993.png') 16 16, auto;
+    }
+
+    #vanta-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 100px 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      text-shadow: 0 0 12px #00f0ff;
+      margin-bottom: 40px;
+    }
+
+    .btn {
+      display: inline-block;
+      margin: 15px;
+      padding: 14px 30px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      color: black;
+      background-color: #00f0ff;
+      text-decoration: none;
+      transition: 0.3s ease;
+      box-shadow: 0 0 10px #00f0ff;
+    }
+
+    .btn:hover {
+      background-color: #00ffaa;
+      box-shadow: 0 0 12px #00ffaa;
+    }
+
+    .welcome {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="vanta-bg"></div>
+
+  <div class="container">
+    <h1>🔐 Welcome, {{ username }}!</h1>
+    <p class="welcome">Role: <strong>{{ role }}</strong></p>
+    <a href="/scan" class="btn">🚀 Start Code Scan</a>
+    <a href="#" class="btn">📄 View Past Reports</a>
+    <a href="/logout" class="btn">🔓 Logout</a>
+  </div>
+
+  <script>
+    VANTA.GLOBE({
+      el: "#vanta-bg",
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false,
+      minHeight: 200.00,
+      minWidth: 200.00,
+      scale: 1.00,
+      scaleMobile: 1.00,
+      color: 0x00f0ff,
+      backgroundColor: 0x0d0820
+    });
+  </script>
+</body>
+</html>
