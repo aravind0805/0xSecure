@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register | Static Code Analyzer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Orbitron', sans-serif;
+      color: #00f0ff;
+      overflow: hidden;
+      background-color: #0d0820;
+    }
+
+    #vanta-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 12px #00f0ff;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      width: 300px;
+    }
+
+    input {
+      padding: 12px;
+      border: 2px solid #00f0ff;
+      border-radius: 8px;
+      background: transparent;
+      color: #00f0ff;
+      text-align: center;
+      font-size: 1rem;
+    }
+
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 10px #00f0ff;
+    }
+
+    .btn {
+      padding: 12px;
+      background: transparent;
+      border: 2px solid #00f0ff;
+      border-radius: 8px;
+      color: #00f0ff;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #00f0ff;
+      color: #000;
+      box-shadow: 0 0 12px #00f0ff;
+    }
+
+    .message {
+      margin-top: 10px;
+      color: #ff4d4d;
+      font-size: 0.9rem;
+      text-shadow: 0 0 5px #ff4d4d;
+    }
+  </style>
+</head>
+<body>
+  <div id="vanta-bg"></div>
+
+  <div class="content">
+    <h2>📝 Register</h2>
+    <form method="POST">
+      <input type="text" name="username" placeholder="Username" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <button class="btn" type="submit">Register</button>
+    </form>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="message">{{ messages[0] }}</div>
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Vanta Globe Animation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+  <script>
+    VANTA.GLOBE({
+      el: "#vanta-bg",
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false,
+      minHeight: 200.00,
+      minWidth: 200.00,
+      scale: 1.00,
+      scaleMobile: 1.00,
+      color: 0x00ffff,
+      backgroundColor: 0x000000
+    });
+  </script>
+</body>
+</html>
