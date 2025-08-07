@@ -1,8 +1,14 @@
+# Updated Flask App using Gemini API for Suggestions
+
 from flask import Flask, render_template, request, send_file, redirect, url_for, session, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from dotenv import load_dotenv
 import os
-import openai
+import google.generativeai as genai
+
+# Load environment variables from .env
+load_dotenv()
 
 # Analyzer modules
 from analyzer.python_analyzer import analyze_python_code
@@ -11,12 +17,13 @@ from analyzer.php_analyzer import analyze_php_code
 
 # Flask App Setup
 app = Flask(__name__)
-app.secret_key = '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'
+app.secret_key = os.getenv('5b25cd73800dac5a584845618d77a22705241a3ecdba863c167728e80d5f0b15', 'GgiKNFHwC1R9FCktFNGxxhHisRtjRqUg8aycgK8fo79Tgk6KimP9jPKXskzZA')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 db = SQLAlchemy(app)
 
-# OpenAI API Key (replace with your actual key)
-openai.api_key = "YOUR_OPENAI_API_KEY"
+# Gemini API Key and Configuration
+genai.configure(api_key=os.getenv("AIzaSyB83hU-wYBOb-200pfz_CiYriNK1QbbuH4"))
+gemini_model = genai.GenerativeModel('gemini-2.0-flash')
 
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -30,6 +37,10 @@ class User(db.Model):
     role = db.Column(db.String(10), nullable=False, default='user')
 
 # -------------------- Routes -------------------- #
+@app.errorhandler(500)
+def internal_error(error):
+    return jsonify({"suggestion": "Internal Server Error. Please check Gemini API key and logs."}), 500
+
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -116,7 +127,7 @@ def scan():
                 results = analyze_php_code(code)
             else:
                 results = [{'line': 0, 'issue': 'Unsupported file type', 'code': filename}]
-    
+
     return render_template('index.html', results=results, username=session.get('username'))
 
 @app.route('/download')
@@ -147,24 +158,25 @@ def download():
 
     return send_file(report_path, as_attachment=True)
 
-# -------------------- GPT Suggestion API -------------------- #
+# -------------------- Gemini Suggestion Endpoint -------------------- #
 @app.route("/suggest_fix", methods=["POST"])
 def suggest_fix():
-    data = request.json
-    issue = data['issue']
-    code = data['code']
-    prompt = f"Here is a vulnerability:\nIssue: {issue}\nCode: {code}\nHow can I fix this issue?"
+    try:
+        data = request.json
+        issue = data['issue']
+        code = data['code']
+        prompt = f"Here is a vulnerability:\nIssue: {issue}\nCode: {code}\nHow can I fix this issue?"
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4",
-        messages=[{"role": "user", "content": prompt}]
-    )
+        response = gemini_model.generate_content(prompt)
+        suggestion = response.text
+        return jsonify({'suggestion': suggestion})
 
-    fix_suggestion = response.choices[0].message['content']
-    return jsonify({'suggestion': fix_suggestion})
+    except Exception as e:
+        return jsonify({'suggestion': f"\u274c Gemini failed to respond.\n{str(e)}"}), 500
 
 # -------------------- Run Server -------------------- #
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True)
+
