@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Static Code Analyzer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Orbitron', sans-serif;
+      background: #0d0820;
+      color: #00f0ff;
+      overflow-x: hidden;
+    }
+
+    #vanta-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 2;
+      max-width: 900px;
+      margin: 100px auto;
+      padding: 60px 40px;
+      background-color: rgba(0, 0, 0, 0.6);
+      border-radius: 16px;
+      box-shadow: 0 0 20px #00f0ff88;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px #00f0ff;
+    }
+
+    .custom-file-upload {
+      display: inline-block;
+      padding: 12px 24px;
+      border: 2px dashed #00f0ff;
+      background: transparent;
+      color: #00f0ff;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 20px;
+      font-weight: bold;
+      transition: 0.3s ease;
+    }
+
+    .custom-file-upload:hover {
+      background: #00f0ff;
+      color: black;
+      box-shadow: 0 0 10px #00f0ff;
+    }
+
+    .custom-file-upload input {
+      display: none;
+    }
+
+    .scan-btn {
+      margin-top: 20px;
+      padding: 12px 30px;
+      background: #00f0ff;
+      color: black;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .scan-btn:hover {
+      background: #00ffaa;
+      box-shadow: 0 0 12px #00ffaa;
+    }
+
+    .scanner-terminal {
+      margin-top: 30px;
+      background: rgba(17, 17, 17, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+      font-family: monospace;
+      text-align: left;
+      max-height: 500px;
+      overflow-y: auto;
+      box-shadow: 0 0 10px #00f0ff;
+    }
+
+    .download-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #00f0ff;
+      border-radius: 10px;
+      color: black;
+      text-decoration: none;
+      font-weight: bold;
+      transition: 0.3s ease;
+    }
+
+    .download-btn:hover {
+      background: #00ffaa;
+      box-shadow: 0 0 10px #00ffaa;
+    }
+
+    .suggest-btn {
+      background: #ffcc00;
+      color: #000;
+      padding: 6px 10px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .fix-output {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #00ffaa;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div id="vanta-bg"></div>
+  <div class="container">
+    <h1>🛡️ Static Code Analyzer</h1>
+
+    {% if not results %}
+    <form method="POST" action="/scan" enctype="multipart/form-data">
+      <label class="custom-file-upload">
+        📁 Choose Code File
+        <input type="file" name="code_file" required />
+      </label>
+      <br />
+      <button type="submit" class="scan-btn">🔍 Scan Code</button>
+    </form>
+    {% endif %}
+
+    {% if results %}
+    <h2>⚠️ Vulnerabilities Found:</h2>
+    <div class="scanner-terminal" id="scanOutput">
+      {% for result in results %}
+      <div class="vuln-item" data-issue="{{ result.issue }}" data-code="{{ result.code }}">
+        <strong>Line {{ result.line }}:</strong> {{ result.issue }}<br>
+        <code style="color: #ffcc00;">{{ result.code }}</code>
+        <br>
+        <button class="suggest-btn">💡 Suggest Fix</button>
+        <div class="fix-output"></div>
+      </div>
+      {% endfor %}
+    </div>
+    <a href="/download" class="download-btn">⬇️ Download Report</a>
+    {% endif %}
+  </div>
+
+  <script>
+    VANTA.GLOBE({
+      el: "#vanta-bg",
+      mouseControls: true,
+      touchControls: true,
+      gyroControls: false,
+      minHeight: 200.00,
+      minWidth: 200.00,
+      scale: 1.00,
+      scaleMobile: 1.00,
+      color: 0x00f0ff,
+      backgroundColor: 0x000000
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll(".suggest-btn").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const vulnDiv = btn.closest(".vuln-item");
+          const issue = vulnDiv.dataset.issue;
+          const code = vulnDiv.dataset.code;
+          const output = vulnDiv.querySelector(".fix-output");
+
+          output.innerHTML = "🔄 Fetching fix suggestion...";
+
+          try {
+            const res = await fetch("/suggest_fix", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ issue, code })
+            });
+
+            const data = await res.json();
+            output.innerHTML = `<pre style="background:#111;padding:10px;border-radius:8px;">${data.suggestion}</pre>`;
+          } catch (err) {
+            output.innerHTML = `❌ Failed to fetch suggestion.<br><code>${err.message}</code>`;
+            console.error("Error fetching fix:", err);
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
