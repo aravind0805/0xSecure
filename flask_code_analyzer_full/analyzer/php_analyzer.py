@@ -1,29 +1,18 @@
-import re
-
 def analyze_php_code(code):
-    """Analyze PHP code for vulnerabilities."""
-    vulnerabilities = []
+    results = []
     lines = code.split('\n')
-    
-    for line_num, line in enumerate(lines, 1):
-        line_stripped = line.strip()
-        
-        # SQL Injection
-        if re.search(r'(mysql_query|mysqli_query).*\$_?(GET|POST)', line_stripped):
-            vulnerabilities.append({
-                'line': line_num,
-                'issue': 'SQL Injection vulnerability',
-                'severity': 'high',
-                'code': line_stripped
+    for idx, line in enumerate(lines, start=1):
+        if 'eval(' in line or 'exec(' in line:
+            results.append({
+                'line': idx,
+                'issue': 'Use of eval/exec is dangerous',
+                'code': line.strip()
             })
-        
-        # XSS
-        if re.search(r'echo.*\$_?(GET|POST)', line_stripped):
-            vulnerabilities.append({
-                'line': line_num,
-                'issue': 'XSS vulnerability',
-                'severity': 'high',
-                'code': line_stripped
-            })
-    
-    return vulnerabilities
+        if '$_GET' in line or '$_POST' in line:
+            if 'htmlspecialchars' not in line and 'sanitize' not in line:
+                results.append({
+                    'line': idx,
+                    'issue': 'Unsanitized input ($_GET/$_POST)',
+                    'code': line.strip()
+                })
+    return results
