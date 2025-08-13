@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>0xSecure Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0b0e1a;
+            --muted: #98a3b8;
+            --accent1: #7c3aed;
+            --accent2: #06b6d4;
+            --danger: #ef4444;
+            --border-transparent: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: var(--bg);
+            font-family: 'Inter', sans-serif;
+            color: #e6eef8;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        #vanta-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+        }
+        
+        .grain {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 3px 3px;
+            opacity: 0.12;
+            z-index: 2;
+        }
+
+        .dashboard-container {
+            position: relative;
+            z-index: 2;
+            height: 100vh;
+            display: flex;
+            justify-content: flex-start; /* Aligned to the left */
+            align-items: center;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s forwards;
+            animation-delay: 0.5s;
+        }
+
+        .left-panel {
+            background: transparent;
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-transparent);
+            padding: 50px;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 450px;
+            margin-left: 50px; /* Added left margin */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+        
+        h1 .username {
+            background-image: linear-gradient(90deg, var(--accent2), var(--accent1));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-transparent);
+            color: #e6eef8;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn:hover {
+            background: linear-gradient(90deg, var(--accent1), var(--accent2));
+            color: #030312;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
+        }
+        
+        .btn i {
+            margin-right: 12px;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 16px;
+            }
+            .left-panel {
+                max-width: 100%;
+                padding: 30px;
+                margin-left: 0; /* Reset margin for mobile */
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="vanta-bg"></div>
+    <div class="grain"></div>
+
+    <div class="dashboard-container" id="dashboardContent">
+        <div class="left-panel">
+            <h1>Welcome, <span class="username">{{ username }}</span>!</h1>
+            <div class="btn-group">
+                <a href="/scan" class="btn"><i class="fas fa-search-plus"></i> Start Code Scan</a>
+                <a href="/reports" class="btn"><i class="fas fa-file-alt"></i> View Past Reports</a>
+                <a href="/logout" class="btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+    <script>
+        // Vanta.js Initialization
+        window.onload = function() {
+            VANTA.GLOBE({
+                el: "#vanta-bg",
+                mouseControls: true,
+                touchControls: true,
+                gyroControls: false,
+                minHeight: 200.00,
+                minWidth: 200.00,
+                scale: 1.00,
+                scaleMobile: 1.00,
+                color: 0x7c3aed, // Matches accent1
+                color2: 0x06b6d4, // Matches accent2
+                size: 0.9,
+                backgroundColor: 0x0b0e1a,
+            });
+        };
+    </script>
+</body>
+</html>
