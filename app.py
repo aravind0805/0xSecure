@@ -34,19 +34,12 @@ UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
-app.config['SECRET_KEY'] = '5b25cd73800dac5a584845618d77a22705241a3ecdba863c167728e80d5f0b15'
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DB_PATH}"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10 MB default
 
-CORS(app)
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # -------------------- Gemini API Config -------------------- #
-# Hardcoding your API key here
-GEMINI_API_KEY = "AIzaSyB83hU-wYBOb-200pfz_CiYriNK1QbbuH4"
-MODEL_NAME = "gemini-2.0-flash"
+
 
 if not GEMINI_API_KEY:
     logging.error("GEMINI_API_KEY is missing!")
