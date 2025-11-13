@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>0xSecure Login</title>
+    <!-- Google Fonts for logo and body text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Michroma&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0b0e1a; /* Background color */
+            --muted: #98a3b8; /* Muted text color */
+            --accent1: #7c3aed; /* Primary accent color */
+            --accent2: #06b6d4; /* Secondary accent color */
+            --danger: #ef4444; /* Danger color for errors */
+            --border-transparent: rgba(255, 255, 255, 0.1); /* Transparent border color */
+            --border-transparent-red: rgba(239, 68, 68, 0.4);
+            --gradient-logo: linear-gradient(90deg, #7c3aed, #06b6d4, #f97316); /* Multi-color logo gradient */
+            --gradient-0x: linear-gradient(90deg, #f97316, #7c3aed);
+            --gradient-secure: linear-gradient(90deg, #06b6d4, #7c3aed);
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%;
+            margin-left: 50px;
+            font-family: 'Inter', sans-serif;
+            color: #e6eef8;
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden;
+            background-color: var(--bg);
+        }
+        
+        #vanta-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            padding: 28px;
+            height: 100vh;
+            z-index: 1;
+            position: relative;
+        }
+        
+        .login-panel {
+            background: transparent;
+            border: 1px solid var(--border-transparent);
+            padding: 50px;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 450px;
+            margin: auto 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            
+            animation: fadeInUp 1s forwards;
+            animation-delay: 0.5s;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .login-panel.shake {
+            animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+        }
+
+        .logo-container {
+            margin: 0 0 24px 0;
+            text-align: center;
+            font-family: 'Michroma', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .logo-0x, .logo-secure {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(124, 58, 237, 0.4);
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        .logo-0x {
+            background-image: var(--gradient-0x);
+            animation-delay: 0s;
+        }
+        
+        .logo-secure {
+            background-image: var(--gradient-secure);
+            animation-delay: 0.1s;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border-transparent);
+            background: rgba(255, 255, 255, 0.05);
+            color: inherit;
+            font-size: 16px;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input.error {
+            border-color: var(--border-transparent-red);
+        }
+        
+        .password-container {
+            position: relative;
+        }
+        
+        .password-container input {
+            padding-right: 40px;
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--muted);
+            transition: color 0.2s ease;
+        }
+        
+        .toggle-password:hover {
+            color: var(--accent2);
+        }
+        
+        .error-message {
+            color: var(--danger);
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 16px;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .error-message.visible {
+            opacity: 1;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .form-actions a {
+            font-size: 14px;
+            color: var(--accent2);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        
+        .form-actions a:hover {
+            color: var(--accent1);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(90deg, var(--accent1), var(--accent2));
+            color: #030312;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(124, 58, 237, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .grain {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 3px 3px;
+            opacity: 0.12;
+            z-index: 2;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { text-shadow: 0 0 10px rgba(124, 58, 237, 0.4); }
+            50% { text-shadow: 0 0 20px rgba(6, 182, 212, 0.6); }
+        }
+
+        @media(max-width: 768px) {
+            .app {
+                grid-template-columns: 1fr;
+                padding: 16px;
+            }
+
+            .login-panel {
+                max-width: 100%;
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Vanta.js globe background container -->
+    <div id="vanta-bg"></div>
+    <!-- grain texture -->
+    <div class="grain"></div>
+
+    <div class="app">
+        <!-- LOGIN PANEL -->
+        <div class="login-panel" id="loginPanel">
+            <h2 class="logo-container">
+                <span class="logo-0x">0x</span><span class="logo-secure">Secure</span>
+            </h2>
+            <div id="errorMessage" class="error-message"></div>
+            <form id="loginForm" method="POST" action="/login">
+                <div class="form-group">
+                    <label for="username">Username / Email</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-container">
+                        <input type="password" id="password" name="password" required>
+                        <i class="fas fa-eye-slash toggle-password" id="togglePassword"></i>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <a href="/forget-password" class="forgot-password">Forgot Password?</a>
+                    <button type="submit" class="btn" id="loginBtn">Login</button>
+                </div>
+            </form>
+        </div>
+        <!-- EMPTY COLUMN TO THE RIGHT -->
+        <div></div>
+    </div>
+
+    <!-- Vanta.js and Three.js scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+    
+    <script>
+        // Vanta.js Initialization
+        window.onload = function() {
+            VANTA.GLOBE({
+                el: "#vanta-bg",
+                mouseControls: true,
+                touchControls: true,
+                gyroControls: false,
+                minHeight: 200.00,
+                minWidth: 200.00,
+                scale: 1.00,
+                scaleMobile: 1.00,
+                color: 0x7c3aed,
+                color2: 0x06b6d4,
+                size: 0.9,
+                backgroundColor: 0x0b0e1a,
+            });
+        };
+
+        // Toggle password visibility
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePassword.addEventListener('click', function (e) {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        // Handle form submission and animations
+        const loginForm = document.getElementById('loginForm');
+        const loginPanel = document.getElementById('loginPanel');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMessage = document.getElementById('errorMessage');
+
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Clear previous errors
+            errorMessage.textContent = '';
+            errorMessage.classList.remove('visible');
+            loginForm.querySelectorAll('input').forEach(input => input.classList.remove('error'));
+            loginPanel.classList.remove('shake');
+            
+            // Simulate a loading state
+            loginBtn.textContent = 'Logging in...';
+            loginBtn.disabled = true;
+
+            const formData = new FormData(loginForm);
+            
+            fetch('/login', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                // If login is successful, the server will redirect, which is handled automatically by the browser
+                // If there's an error, the server will redirect back, and we need to check for flashed messages
+                // This is a simplified client-side logic as Flask handles the redirects.
+                // In a real-world app, you might use JSON responses for a better UX.
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    // This block might not be reached with the current Flask redirect logic.
+                    // A more robust solution would be to use AJAX and JSON responses.
+                    loginBtn.textContent = 'Login';
+                    loginBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Login failed:', error);
+                errorMessage.textContent = 'A network error occurred. Please try again.';
+                errorMessage.classList.add('visible');
+                loginBtn.textContent = 'Login';
+                loginBtn.disabled = false;
+                loginPanel.classList.add('shake');
+                setTimeout(() => loginPanel.classList.remove('shake'), 500);
+            });
+        });
+    </script>
+</body>
+</html>
